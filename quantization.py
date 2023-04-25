@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.quantization
+from prune import prune_network
 
 # Load pre-pruned model
 model = torch.load('pre_pruned_model.pth')
