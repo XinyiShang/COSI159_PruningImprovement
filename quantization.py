@@ -18,7 +18,8 @@ pre_pruned_acc = evaluate(model, val_dataset)
 quantized_acc = []
 for i in range(num_pruning_steps):
     # Prune model further and reapply post-quantization if necessary
-    model = prune_network(args, network=network)
+    # pruning can be ingore as the pre=pruned network is the model
+    #model = prune_network(args, network=network)
     model = torch.quantization.quantize_dynamic(model, {torch.nn.Conv2d, torch.nn.Linear}, dtype=torch.qint8, dataset=dataset)
     
     # Evaluate accuracy of quantized model on validation dataset
