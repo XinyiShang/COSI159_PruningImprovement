@@ -3,23 +3,30 @@ import torch.nn as nn
 import torch.quantization
 
 # Load pre-pruned model
-model = torch.load('check_point.pth')
+model = torch.load('pre_pruned_model.pth')
 
-# Define quantization layers for each type of layer in the model
-quant_conv = nn.quantized.Conv2d( ... )  # Specify quantization parameters as needed
-quant_fc = nn.quantized.Linear( ... )
+# Define quantization layers and apply post-quantization as described in previous answer
 
-# Replace each layer in the model with its corresponding quantization layer
-# You can use the model.named_modules() function to iterate over all modules in the model
-for name, module in model.named_modules():
-    if isinstance(module, nn.Conv2d):
-        setattr(model, name, quant_conv)
-    elif isinstance(module, nn.Linear):
-        setattr(model, name, quant_fc)
+# Load validation dataset used in pruning process
+val_dataset = torch.utils.data.DataLoader( ... )
 
-# Quantize the model weights and activations based on a representative dataset
-dataset = torch.utils.data.DataLoader( ... )  # Define a representative dataset
-model = torch.quantization.quantize_dynamic(model, {torch.nn.Conv2d, torch.nn.Linear}, dtype=torch.qint8, dataset=dataset)
+# Evaluate accuracy of pre-pruned model on validation dataset
+pre_pruned_acc = evaluate(model, val_dataset)
 
-# Save the quantized model to a new file
-torch.save(model.state_dict(), 'pre_pruned_and_quantized_model.pth')
+# Iterate over pruning steps and record accuracy of quantized model at each step
+quantized_acc = []
+for i in range(num_pruning_steps):
+    # Prune model further and reapply post-quantization if necessary
+    model = prune(model, pruning_rate)
+    model = torch.quantization.quantize_dynamic(model, {torch.nn.Conv2d, torch.nn.Linear}, dtype=torch.qint8, dataset=dataset)
+    
+    # Evaluate accuracy of quantized model on validation dataset
+    quantized_acc_i = evaluate(model, val_dataset)
+    
+    # Record accuracy of quantized model at this pruning step
+    quantized_acc.append(quantized_acc_i)
+
+    # Compare accuracy of quantized model to accuracy of pre-pruned model
+    acc_diff = quantized_acc_i - pre_pruned_acc
+    print(f"Pruning step {i+1}: Quantized model accuracy = {quantized_acc_i}, accuracy difference from pre-pruned model = {acc_diff}")
+
