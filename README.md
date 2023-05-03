@@ -31,6 +31,10 @@ Usage
 * `--retrain-epoch`: Number of epoch for retraining pruned network
 * `--retrain-lr`: Number of epoch for retraining pruned network
 
+Drop out VGG-19
+--
+You can follow the procedure of prune filter in the .ipynb file but switch the network to the corresponding network file: drop_out_network.py and VGG_19_network.py
+
 quantization
 --
 
