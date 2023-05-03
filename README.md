@@ -28,11 +28,11 @@ Usage
 * `--retrain-epoch`: Number of epoch for retraining pruned network
 * `--retrain-lr`: Number of epoch for retraining pruned network
 
-Drop out VGG-19
+Drop out & VGG-19
 --
 You can follow the procedure of prune filter in the .ipynb file but switch the network to the corresponding network file: drop_out_network.py and VGG_19_network.py
 
-quantization
+Quantization
 --
 
 quantization.py file apply quantization to the original VGG-16 model. we created a new network trying to fit the pruned and retrained network into the original model which unfortunately failed.
