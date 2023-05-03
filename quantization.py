@@ -1,34 +1,47 @@
 import torch
+import os
 import torch.nn as nn
-import torch.quantization
-from prune import prune_network
+from new_network import VGG
+from evaluate import test_network
 
-# Load pre-pruned model
-model = torch.load('pre_pruned_model.pth')
+# Load the model checkpoint
+checkpoint = torch.load('/content/drive/MyDrive/Pruning_filters_for_efficient_convnets-master/Pruning_filters_for_efficient_convnets-master/trained_models/check_point.pth')
+print(checkpoint.keys())
+# Re-create the model architecture
+model = VGG()
+model.classifier = nn.Sequential(
+    nn.Linear(512 * 7 * 7, 4096),
+    nn.ReLU(True),
+    nn.Dropout(),
+    nn.Linear(4096, 4096),
+    nn.ReLU(True),
+    nn.Dropout(),
+    nn.Linear(4096, 1000),
+)
 
-# Define quantization layers and apply post-quantization as described in previous answer
+# Load the pruned and retrained model state dict
+model.load_state_dict(checkpoint['state_dict'], strict = False)
 
-# Load validation dataset used in pruning process
-val_dataset = torch.utils.data.DataLoader( ... )
+input_layer = torch.quantization.QuantStub()
+output_layer = torch.quantization.DeQuantStub()
 
-# Evaluate accuracy of pre-pruned model on validation dataset
-pre_pruned_acc = evaluate(model, val_dataset)
+network = torch.nn.Sequential(
+    input_layer,
+    network.features,
+    torch.nn.Flatten(),
+    network.classifier,
+    output_layer,
+)
 
-# Iterate over pruning steps and record accuracy of quantized model at each step
-quantized_acc = []
-for i in range(num_pruning_steps):
-    # Prune model further and reapply post-quantization if necessary
-    # pruning can be ingore as the pre=pruned network is the model
-    #model = prune_network(args, network=network)
-    model = torch.quantization.quantize_dynamic(model, {torch.nn.Conv2d, torch.nn.Linear}, dtype=torch.qint8, dataset=dataset)
-    
-    # Evaluate accuracy of quantized model on validation dataset
-    quantized_acc_i = evaluate(model, val_dataset)
-    
-    # Record accuracy of quantized model at this pruning step
-    quantized_acc.append(quantized_acc_i)
+quantized_network = torch.quantization.quantize_dynamic(network, {torch.nn.Linear}, dtype=torch.qint8)
+torch.save(quantized_network.state_dict(), 'quantized_network.pth')
 
-    # Compare accuracy of quantized model to accuracy of pre-pruned model
-    acc_diff = quantized_acc_i - pre_pruned_acc
-    print(f"Pruning step {i+1}: Quantized model accuracy = {quantized_acc_i}, accuracy difference from pre-pruned model = {acc_diff}")
+network.load_state_dict(torch.load('/content/drive/MyDrive/Pruning_filters_for_efficient_convnets-master/Pruning_filters_for_efficient_convnets-master/quantized_network.pth'),strict=False)
+test_network(data_set='CIFAR10', network=network)
 
+# Get the size of the file
+size_bytes = os.path.getsize("/content/drive/MyDrive/Pruning_filters_for_efficient_convnets-master/Pruning_filters_for_efficient_convnets-master/quantized_network.pth")
+size_bytes2 = os.path.getsize("/content/drive/MyDrive/Pruning_filters_for_efficient_convnets-master/Pruning_filters_for_efficient_convnets-master/trained_models/check_point.pth")
+
+print(f"Size of quantized model checkpoint: {size_bytes} bytes")
+print(f"Size of unquantized model checkpoint: {size_bytes2} bytes")
