@@ -31,42 +31,7 @@ Usage
 * `--retrain-epoch`: Number of epoch for retraining pruned network
 * `--retrain-lr`: Number of epoch for retraining pruned network
 
-### Example Scripts
-
-#### Train VGG on CIFAR-10 Data set
-```
-python main.py --train-flag --data-set CIFAR10 --vgg vgg16_bn --save-path ./trained_models/
-```
-
-#### Prune VGG by 'greedy strategy'
-```
-python main.py --prune-flag --load-path ./trained_models/check_point.pth --save-path ./trained_models/pruning_reuslts/ --prune-layers conv1 conv2 --prune-channels 1 1 
-```
-
-#### Prune VGG by 'independent strategy'
-```
-python main.py --prune-flag --load-path ./trained_models/check_point.pth --save-path ./trained_models/pruning_reuslts/ --prune-layers conv1 conv2 --prune-channels 1 1 --independent-prune-flag
-```
-
-#### Retrain the pruned network
-```
-python main.py --prune-flag --load-path ./trained_models/check_point.pth --save-path ./trained_models/pruning_reuslts/ --prune-layers conv1 --prune-channels 1 --retrain-flag --retrain-epoch 20 --retrain-lr 0.001
-```
-
-Results
+quantization
 --
 
-#### Absolute sum of filter weights for each layer of VGG-16 trained on CIFARA-10
-* This graph was created in [jupyter notebook](https://github.com/tyui592/notepad/blob/master/pruning_filters_for_efficient_convets/prune_filter_for_efficient_convnets.ipynb). You can make the graph yourself.
-
-![figure1](./imgs/figure1.png)
-
-#### Pruning filters with the lowest absolute weights sum and their corresponding test accuracies on CIFAR-10
-* This graph was created in [jupyter notebook](https://github.com/tyui592/notepad/blob/master/pruning_filters_for_efficient_convets/prune_filter_for_efficient_convnets.ipynb). You can make the graph yourself.
-
-![figure2](./imgs/figure2.png)
-
-#### Prune and retrain for each single layer of VGG-16 on CIFAR-10
-* This graph was created in [jupyter notebook](https://github.com/tyui592/notepad/blob/master/pruning_filters_for_efficient_convets/prune_filter_for_efficient_convnets.ipynb). You can make the graph yourself.
-
-![figure3](./imgs/figure3.png)
+quantization.py file apply quantization to the original VGG-16 model. we created a new network trying to fit the pruned and retrained network into the original model which unfortunately failed.
