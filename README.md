@@ -36,3 +36,7 @@ Quantization
 --
 
 quantization.py file apply quantization to the original VGG-16 model. we created a new network trying to fit the pruned and retrained network into the original model which unfortunately failed.
+
+Write Up
+--
+https://drive.google.com/drive/folders/1vxF0YL90rF_19sQyHhwGfC_WtgVl7NmW?usp=drive_link
